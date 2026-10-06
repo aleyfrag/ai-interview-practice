@@ -8,7 +8,7 @@ import jakarta.validation.constraints.Size;
 public record SubmitAnswerRequest(
         @NotNull
         @Min(1)
-        Integer QuestionNumber,
+        Integer questionNumber,
 
         @NotBlank
         @Size(max = 10000)

@@ -5,5 +5,6 @@ import java.util.UUID;
 public record StartInterviewResponse(
 
         UUID interviewId,
+        int questionNumber,
         String question) {
 }

@@ -2,8 +2,8 @@ package com.aleyfrag.interview_service.controller;
 
 import com.aleyfrag.interview_service.dto.StartInterviewRequest;
 import com.aleyfrag.interview_service.dto.StartInterviewResponse;
-import com.aleyfrag.interview_service.model.InterviewSession;
-import com.aleyfrag.interview_service.service.GeminiService;
+import com.aleyfrag.interview_service.dto.SubmitAnswerRequest;
+import com.aleyfrag.interview_service.dto.SubmitAnswerResponse;
 import com.aleyfrag.interview_service.service.InterviewService;
 import jakarta.validation.Valid;
 import org.springframework.http.ContentDisposition;
@@ -21,43 +21,67 @@ public class InterviewController {
 
     private final InterviewService interviewService;
 
-    public InterviewController(InterviewService interviewService){
-        this.interviewService =  interviewService;
+    public InterviewController(InterviewService interviewService) {
+        this.interviewService = interviewService;
     }
 
+    // ---------------------------------------------------------
+    // START INTERVIEW
+    // ---------------------------------------------------------
 
     @PostMapping
-    public StartInterviewResponse startInterview(@Valid @RequestBody StartInterviewRequest request){
+    public StartInterviewResponse startInterview(
+            @Valid @RequestBody StartInterviewRequest request) {
 
-        InterviewSession session = interviewService.startInterview(
+        return interviewService.startInterview(
                 request.jobRole(),
                 request.experienceYears()
         );
-
-        return new StartInterviewResponse(
-                session.interviewId(),
-                session.questions().get(0).text()
-        );
-
     }
 
+    // ---------------------------------------------------------
+    // ANSWER THE QUESTIONS
+    // ---------------------------------------------------------
 
+
+    @PostMapping("/{interviewId}/answers")
+    public SubmitAnswerResponse submitAnswer(
+            @PathVariable("interviewId") UUID interviewId,
+            @Valid @RequestBody SubmitAnswerRequest request) {
+
+        return interviewService.submitAnswer(interviewId, request);
+    }
+
+    // ---------------------------------------------------------
+    // DOWNLOAD QUESTIONS
+    // ---------------------------------------------------------
 
     @GetMapping("/{interviewId}/questions/download")
-    public ResponseEntity<byte[]> downloadQuestions(@PathVariable("interviewId") UUID interviewId)
-    throws IOException {
+    public ResponseEntity<byte[]> downloadQuestions(
+            @PathVariable UUID interviewId)
+            throws IOException {
 
-        byte[] zipFile = interviewService.downloadQuestions(interviewId);
+        byte[] zipFile =
+                interviewService.downloadQuestions(interviewId);
 
-        String disposition = ContentDisposition.attachment()
-                .filename("interview-"+interviewId+".zip")
-                .build()
-                .toString();
+        String disposition =
+                ContentDisposition
+                        .attachment()
+                        .filename(
+                                "interview-" + interviewId + ".zip"
+                        )
+                        .build()
+                        .toString();
 
-        return ResponseEntity.ok().contentType(MediaType.parseMediaType("application/zip"))
-                .header(HttpHeaders.CONTENT_DISPOSITION, disposition)
+        return ResponseEntity.ok()
+                .contentType(
+                        MediaType.parseMediaType("application/zip")
+                )
+                .header(
+                        HttpHeaders.CONTENT_DISPOSITION,
+                        disposition
+                )
                 .contentLength(zipFile.length)
                 .body(zipFile);
-
     }
 }
