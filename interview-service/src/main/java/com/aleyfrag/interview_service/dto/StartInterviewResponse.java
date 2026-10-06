@@ -1,4 +1,9 @@
 package com.aleyfrag.interview_service.dto;
 
-public record StartInterviewResponse(String question) {
+import java.util.UUID;
+
+public record StartInterviewResponse(
+
+        UUID interviewId,
+        String question) {
 }
