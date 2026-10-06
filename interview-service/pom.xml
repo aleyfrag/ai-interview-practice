@@ -70,7 +70,14 @@
             <artifactId>postgresql</artifactId>
             <scope>runtime</scope>
         </dependency>
+
+        <dependency>
+            <groupId>com.google.genai</groupId>
+            <artifactId>google-genai</artifactId>
+            <version>1.73.0</version>
+        </dependency>
 	</dependencies>
+
 
 	<build>
 		<plugins>
